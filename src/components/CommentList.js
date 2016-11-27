@@ -29,6 +29,16 @@ class CommentList extends Component {
             <div>
                 {this.getButton()}
                 {this.getList()}
+                <form >
+                    Title:  <input type="text" name="title" />
+                    <br/>
+                    Author:  <input type="text" name="author" />
+                    <br/>
+                    Comment : <br />
+                    <textarea rows="5" cols="50" name="comment" defaultValue="Enter comment here..." />
+                    <br/>
+                    <input type="submit" name="submit" value="Submit" />
+                </form>
             </div>
         )
     }
