@@ -25,6 +25,8 @@ class CommentList extends Component {
 
 
     render() {
+        //значения полей должны жить в state
+
         return (
             <div>
                 {this.getButton()}
