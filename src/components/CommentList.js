@@ -1,9 +1,15 @@
 import React, { Component, PropTypes } from 'react'
+import { connect } from 'react-redux'
+import { addComment, checkAndLoadComments } from '../AC/comments'
 import Comment from './Comment'
+import Loader from './Loader'
 import toggleOpen from '../decorators/toggleOpen'
+import NewCommentForm from './NewCommentForm'
 
 class CommentList extends Component {
     static propTypes = {
+        article: PropTypes.object.isRequired,
+        //from connect
         comments: PropTypes.array.isRequired,
         //from toggleOpen decorator
         isOpen: PropTypes.bool.isRequired,
@@ -15,30 +21,15 @@ class CommentList extends Component {
     }
 
 
-    componentWillReceiveProps() {
-        //console.log('---', 'CL receiving props')
+    componentWillReceiveProps({ isOpen, checkAndLoadComments, article}) {
+        if (isOpen && !this.props.isOpen) checkAndLoadComments(article.id)
     }
-
-    componentWillUpdate() {
-        //console.log('---', 'CL will update')
-    }
-
 
     render() {
         return (
             <div>
                 {this.getButton()}
-                {this.getList()}
-                <form >
-                    Title:  <input type="text" name="title" />
-                    <br/>
-                    Author:  <input type="text" name="author" />
-                    <br/>
-                    Comment : <br />
-                    <textarea rows="5" cols="50" name="comment" defaultValue="Enter comment here..." />
-                    <br/>
-                    <input type="submit" name="submit" value="Submit" />
-                </form>
+                {this.getBody()}
             </div>
         )
     }
@@ -50,12 +41,16 @@ class CommentList extends Component {
         return <a href="#" onClick = {toggleOpen}>{isOpen ? 'hide' : 'show'} comments</a>
     }
 
-    getList() {
-        const { comments, isOpen } = this.props
-        if (!isOpen || !comments.length) return null
+    getBody() {
+        const { article, comments, isOpen, addComment } = this.props
+        const commentForm = <NewCommentForm articleId = {article.id} addComment = {addComment} />
+        if (!isOpen || !comments.length) return <div>{commentForm}</div>
+        if (!article.commentsLoaded || article.commentsLoading) return <Loader />
         const commentItems = comments.map(comment => <li key = {comment.id}><Comment comment = {comment} /></li>)
-        return <ul>{commentItems}</ul>
+        return <div><ul>{commentItems}</ul>{commentForm}</div>
     }
 }
 
-export default toggleOpen(CommentList)
+export default connect((state, props) => ({
+    comments: (props.article.comments || []).map(id => state.comments.getIn(['entities', id]))
+}), { addComment, checkAndLoadComments })(toggleOpen(CommentList))

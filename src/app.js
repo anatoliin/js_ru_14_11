@@ -1,7 +1,5 @@
 import React from 'react'
 import { render } from 'react-dom'
-import { articles } from './fixtures'
-import App from './components/App'
+import routes from './routes'
 
-
-render(<App articles = {articles} />, document.getElementById('container'))
+render(routes, document.getElementById('container'))
